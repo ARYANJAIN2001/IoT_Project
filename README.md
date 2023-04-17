@@ -28,7 +28,7 @@ Here the Push Button acts as a manual switch for the LED Strip.
 - SinricPro, SinricProLight
 - SinricPro / ESP Rainmaker web platform and apps
 - AsyncElegantOTA.h, ArduinoOTA.h (for OTA functionality)
-- UbidotsESPMQTT.h
+- UbidotsESPMQTT.h (for Ubidots integration)
 - AsyncMqttClient
 - Arduino IDE
 - Alexa, Google home app 
@@ -68,9 +68,23 @@ The Push Button is powered using the ESP8266 3.3V, thus ESP8266 3.3V is connecte
 ### For Smart Bulb
 1. Sign up in Sinric Pro
     - Click on Devices, then click on Add Device
-    - Add the Device Name(corresponding to the LED strip), description and Device Type(Smart Light Bulb)
+    - Add the Device Name(call it Smart Bulb), description and Device Type(Smart Light Bulb)
     - Sinric Pro associates every Device with a DeviceID(let's call it *Light_ID*)
-2. Now update the *Light_ID*, your App key and App secret and the Wifi credentials in the code.
+2. Now update the *Light_ID*, your App key and App secret and the Wifi credentials in the code(`Arduino_code/substitute/substitute.ino`).
+
+### For Smart LED
+1. Sign up in Sinric Pro
+    - Click on Device Templates, then click on Add Device Template
+    - Add the Template Name(eg: LEDStrip), description and Device Type(Smart Light Bulb)
+    - Select capabilities by drag and drop. We can only choose 3 in non-premimum mode.
+      - Select Power, Mode and Brightness
+      - Configure Mode, add Mode name as *Theme* and add new mode values
+      - To replicate our code, add mode values as Party, Power Saver, Normal, Cloudy
+    - Now click on Devices, then click on Add Device
+    - Add the Device Name(call it Smart LED), description and Device Type
+      - Select the Device Type as the Device Template you just created(LEDStrip).
+    - Sinric Pro associates every Device with a DeviceID(let's call it *Light_ID*)
+2. Now update the *Light_ID*, your App key and App secret and the Wifi credentials in the code(`Arduino_code/main/main.ino`).
 
 
 ## Working
