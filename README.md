@@ -75,14 +75,14 @@ The Push Button is powered using the ESP8266 3.3V, thus ESP8266 3.3V is connecte
 ### For Smart LED
 1. Sign up in Sinric Pro
     - Click on Device Templates, then click on Add Device Template
-    - Add the Template Name(eg: LEDStrip), description and Device Type(Smart Light Bulb)
+    - Add the Template Name(eg: LedStrip), description and Device Type(Smart Light Bulb)
     - Select capabilities by drag and drop. We can only choose 3 in non-premimum mode.
       - Select Power, Mode and Brightness
       - Configure Mode, add Mode name as *Theme* and add new mode values
       - To replicate our code, add mode values as Party, Power Saver, Normal, Cloudy
     - Now click on Devices, then click on Add Device
     - Add the Device Name(call it Smart LED), description and Device Type
-      - Select the Device Type as the Device Template you just created(LEDStrip).
+      - Select the Device Type as the Device Template you just created(LedStrip).
     - Sinric Pro associates every Device with a DeviceID(let's call it *Light_ID*)
 2. Now update the *Light_ID*, your App key and App secret and the Wifi credentials in the code(`Arduino_code/main/main.ino`).
 
@@ -93,6 +93,7 @@ This section shows the workflow of the project.
 | ![Arduino Script Design for Smart Bulb](/Arduino-design-2.png) |
 |:--:| 
 | *Arduino Script Design for Smart Bulb* |
+Code is available at Arduino_code/substitute/substitute.ino
 1. The ESP8266 first connects to the WIFI using the specified credentials.
 2. We have created a new Light Device using Sinric Pro library. Like:  `SinricProLight &myLight = SinricPro[*Light_ID*]`
     - This is the Light Device associated with the Smart Bulb we created on the Sinric Pro library.
@@ -127,11 +128,46 @@ This section shows the workflow of the project.
 |![Arduino Script Design for Smart LED](/Arduino-design-1.png)|
 |:--:| 
 | *Arduino Script Design for Smart LED* |
+Code is available at Arduino_code/main/main.ino
+
+1. The ESP8266 first connects to the WIFI using the specified credentials.
+2. We have created a new LedStrip Device using Sinric Pro library. Like:  `LedStrip &ledStrip = SinricPro[DEVICE_ID];`
+    - This is the Light Device associated with the Smart LED we created on the Sinric Pro library.
+3. This library has callback functions that are called every time a variable is changed. We define the callback function for this light device.
+4. *onPowerState* callback function will be called everytime *PowerState* of the *ledStrip* will change on the Cloud.
+5. *Similarly, onBrightness*, *onAdjustBrightness* and *onColor" callback functions are also defined.
+6. We have created another callback function *onSetMode* that will be called evertime the Mode of this ledStrip device is being changed at the Cloud (either using the Alexa app or using the Sinric Pro app).
+    - We have created different functions that create different light patterns corresponding to different Light Modes.
+7. For the Power Saver mode, we have created a C server (analyser.c) which uses MQTT protocol to publish and subscribe to the topics.
+    - We use the Mosquitto Broker. 
+    - Here our ESP8266 and the C server both acts as MQTT client.
+    - C server has subscribed to the `powerSave/analysis` topic and publishes to the `powerSave/alert` topic.
+    - ESP8266 has subscribed to the `powerSave/alert` topic and publishes to the `powerSave/analysis` topic.
+    - When Power Saver mode is turned ON, *enabled* variable is set as 1.
+9. Now the following code runs in loop
+    - The function `handleButtonPress` which handles the push button. It checks if the push button is being pressed or not, if yes then it toggles the Power state of the LEDs.
+      - To update the *PowerState* back to the Cloud, we use the function `sendPowerStateEvent()` provided by the Sinric Pro library with the newly updated value of *PowerState*.
+    - Then it checks if its been more than 10 seconds, if yes:
+       - It checks if the PowerSaver was enabled, if it was enabled, it puts globalState in the message payload.
+       - Otherwise it puts the globalPowerState in the message payload
+       - We then publish this message to the broker with the topic to which C server has subscribed.
+       - On C server, we have a variable last_update_time which is set to -1 if the PowerSave mode is OFF, otherwise it is set to the last time any update was made to the Smart LED.
+       - On C server, a function publishThread() is running on a separate which is checks if last_update_time is still -1 or not
+       - On receiving this message, C server checks if the PowerSaver option was enabled or not by checking the message payload. It updates the last_update_time to -1 if the PowerSave mode not enabled, else set to the current time.
+       - Whenever last_update_time is differnt from -1, publishThread() checks if it has been more than 60 seconds between last update and current time, if yes then it publishes message with "inactive" as payload to the broker with topic powerSave/alert. 
+       - ESP8266 receives the message from broker from topic powerSave/alert and then calls the onMqttMessage(). It then checks if the message payload is "inactive", if yes then it reduces the brightness by 50% using the setBrightness function of FastLED.
+    - Then it handles any updates from the Sinric Pro platform which includes updates from Alexa/ Google Home aap and the Sinric Pro app.
+      - If user turns OFF the Smart LED using any of the above specified platform
+      - The callback function corresponding to *PowerState* i.e *onPowerState* is called and the FastLED finally turns OFF the LED.
+      - If user changed the mode of the Smart LED using Alexa or Sinric Pro app
+      - The callback function corresponding to *mode* i.e *onSetMode* is called and the FastLED finally changes the mode.
+
+
 
 ## Extensions
 ### Power Saver
 It is an option which we can enable. If this option is enabled, it reduces the brightness by 50% for every inactive interval of 60 seconds. 
-For this we have created a C server `analyser.c` which makes use of `MQTTClient.h` library. 
+For this we have created a C server `analyser.c` which makes use of `MQTTClient.h` library. (Working is explained above)
 
 ### OTA functionality
 We have added OTA feature so that user can upload a new sketch whenever required without the necessity of having the serial connection with the ESP8266 board.
