@@ -86,6 +86,68 @@ The Push Button is powered using the ESP8266 3.3V, thus ESP8266 3.3V is connecte
     - Sinric Pro associates every Device with a DeviceID(let's call it *Light_ID*)
 2. Now update the *Light_ID*, your App key and App secret and the Wifi credentials in the code(`Arduino_code/main/main.ino`).
 
+### For C server 
+1. The C sever uses ***Paho MQTT C client*** library. The steps to install and build the library is written below:
+   - Move to the folder where you want to install Paho MQTT C client library and let it be *$DEST_PATH* . Open the terminal.
+   ```cpp 
+    $ sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui git doxygen graphviz libssl-dev
+    $ git clone https://github.com/eclipse/paho.mqtt.c.git
+    $ cd paho.mqtt.c
+    $ cmake -Bbuild -H. -DPAHO_WITH_SSL=ON
+    $ sudo cmake --build build/ --target install
+    $ sudo ldconfig
+   ```  
+2. Move to the folder containing C analyser code. In order to compile the code run the following command in the terminal.
+   ```cpp
+    $ gcc -L${DEST_PATH}/paho.mqtt.c/build/output -o server analyser.c -lpaho-mqtt3c -lpthread
+   ```
+3. In order to run the server type the command.
+   ```cpp
+    $ ./server     
+   ```
+
+### Install Mosquittto Broker
+1. Install the mosquitto package.
+   ```cpp
+    $ sudo apt install -y mosquitto     
+   ```
+2. The mosquitto package should now load on your server. Confirm the status of the mosquitto service (Ensure that the mosquittto package is loaded and active).
+   ```cpp
+    $ sudo systemctl status mosquitto 
+   ```
+3. Once running, you can manage the mosquitto services by executing the following commands.
+    - Stop the mosquitto service:
+      ```cpp
+      $ sudo systemctl stop mosquitto
+      ```
+    - Start the mosquitto service:
+      ```cpp
+      $ sudo systemctl start mosquitto
+      ```
+    - Restart the mosquitto service:
+      ```cpp
+      $ sudo systemctl restart mosquitto
+      ```
+4. By default, the mosquittto broker will not handle anonymous connections. The server compiled by analyser.c and the client written in the sketch doesn't use any authentication service. In order to make the  mosquittto broker listen to anonymous clients, we need to tweak the configration file as shown below.
+   ```
+    $ sudo nano /etc/mosquitto/conf.d/default.conf
+   ```  
+    Now add the following lines in the file :
+    ```
+    listener 1883
+    allow_anonymous true
+    ```
+5. Restart the mosquittto broker.
+
+
+### Install FastLED library.
+
+1. Click here to download the [FastLED library ](https://github.com/FastLED/FastLED) from the offical github repository in .zip format. 
+2. Open the Arduino IDE. Move to the *Sketch > Include Library > Add .ZIP library*.
+3. Enter the destination of the downloaded fastLED zip folder.
+4. Arduino wil add the library in the sketch. 
+
+
 
 ## Working
 This section shows the workflow of the project.
