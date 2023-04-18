@@ -39,19 +39,19 @@
 #include "SinricPro.h"
 #include "SinricProLight.h"
 
-#define WIFI_SSID         "Aryan"    
-#define WIFI_PASS         "12345678"
-#define APP_KEY           "7e8bb5c8-ccf2-4435-8761-ad360a39f065"      // Should look like "de0bxxxx-1x3x-4x3x-ax2x-5dabxxxxxxxx"
-#define APP_SECRET        "dd111aee-6392-496f-be2d-b071be6aa770-c5c6dd55-86c4-487a-903a-dc34d655f8c9"   // Should look like "5f36xxxx-x3x7-4x3x-xexe-e86724a9xxxx-4c4axxxx-3x3x-x5xe-x9x3-333d65xxxxxx"
-#define LIGHT_ID          "6433207f918a3c911c79ace8"    // Should look like "5dc1564130xxxxxxxxxxxxxx"
+#define WIFI_SSID         "WIFI SSID"    
+#define WIFI_PASS         "PASSWORD"
+#define APP_KEY           "Sinric pro credentials"      // Should look like "de0bxxxx-1x3x-4x3x-ax2x-5dabxxxxxxxx"
+#define APP_SECRET        "Sinric pro credentials"    // Should look like "5f36xxxx-x3x7-4x3x-xexe-e86724a9xxxx-4c4axxxx-3x3x-x5xe-x9x3-333d65xxxxxx"
+#define LIGHT_ID          "Sinric pro credentials"     // Should look like "5dc1564130xxxxxxxxxxxxxx"
 #define BAUD_RATE         9600                // Change baudrate to your need
 
 #define NUM_LEDS          7                  // how much LEDs are on the stripe
 #define LED_PIN           D0                 // LED stripe is connected to PIN 3
 #define BUTTON_PIN        D1
 
-char* UBIDOTS_TOKEN = "BBFF-PCTOTaKFN5lc6IHELBgbdngokiT48p";  // Put here your Ubidots TOKEN
-char* ubidots_device = "LedStrip";  // Replace with your device label
+char* UBIDOTS_TOKEN = "Ubidots token";  // Put here your Ubidots TOKEN
+char* ubidots_device = "Device name";  // Replace with your device label
 Ubidots ubidots(UBIDOTS_TOKEN);
 
 

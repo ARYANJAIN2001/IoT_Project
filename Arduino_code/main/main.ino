@@ -44,12 +44,13 @@
 #include <ArduinoOTA.h>
 
 
-#define APP_KEY    "7e8bb5c8-ccf2-4435-8761-ad360a39f065"
-#define APP_SECRET "dd111aee-6392-496f-be2d-b071be6aa770-c5c6dd55-86c4-487a-903a-dc34d655f8c9"
-#define DEVICE_ID  "6432d224918a3c911c7963f2"
 
-#define SSID       "Aryan"
-#define PASS       "12345678"
+#define APP_KEY    "Sinric pro credentials"
+#define APP_SECRET "Sinric pro credentials"
+#define DEVICE_ID  "Sinric pro credentials"
+
+#define SSID       "WIFI SSID"
+#define PASS       "PASSWORD"
 
 #define BAUD_RATE  9600
 
